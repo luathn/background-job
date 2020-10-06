@@ -1,0 +1,1 @@
+    UpdateCountWorker.perform_async(@video.id)

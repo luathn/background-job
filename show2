@@ -1,0 +1,1 @@
+    REDIS.hset("count", @video.id, REDIS.hget("count", @video.id).to_i + 1)

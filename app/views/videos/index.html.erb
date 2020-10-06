@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Videos</h1>
+
+  <% @videos.each do |video| %>
+    <div style="float: left; margin-left: 50px; max-width: 300px">
+      <div>
+        <h2><%= link_to video.title, video %></h2>
+        <div>
+          <div><%= video.content %></div>
+          <span style="font-size: 20px; font-weight: bold">
+            Views: <%= video.views_count %>
+          </span>
+        </div>
+      </div>
+      <span><%= link_to 'Show', video %></span>
+      <span><%= link_to 'Edit', edit_video_path(video) %></span>
+      <span><%= link_to 'Destroy', video, method: :delete, data: { confirm: 'Are you sure?' } %></span>
+    </div>
+  <% end %>
+
+<br>
+
+<%= link_to 'New Video', new_video_path %>
