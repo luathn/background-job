@@ -1,12 +1,41 @@
 name: CI workflow
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   test:
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+        - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.5 # Not needed with a .ruby-version file
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - run: bundle exec rspec
+        ruby-version: 2.6.5
+        bundler-cache: true
+
+    - name: Verify MySQL connection from host
+      run: |
+        sudo systemctl enable mysql.service
+        sudo systemctl start mysql.service
+        mysql --host 127.0.0.1 --port 3306 -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
+
+    - name: Setup Yarn
+      run: yarn install --check-files
+
+    - name: Copy ci.env
+      run: |
+        cp .ci.env .env
+
+    - name: Setup Rails DB
+      run: |
+        bundle exec rails db:create
+        bundle exec rails db:migrate
+
+    - name: Run test
+      run: bundle exec rspec
